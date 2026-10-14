@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.2 (2026-10-14)
+
+### Features
+
+- Option+Tab stays in the session: the plugin binds no key to back by default, its key list names dev's last-window bind
+
+### Fixes
+
+- a named worktree's running session is attached, not an empty shell popup
+
 ## v0.1.2 (2026-10-14)
 
 - internal changes

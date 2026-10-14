@@ -17,13 +17,21 @@ action's keys. Set options in `~/.tmux.conf` above the TPM `run` line; to change
 | `@hal9k-tmux-key-jump-<digit>` | one numbered jump alone (`-key-jump-0` to `-key-jump-9`); wins over the modifier |
 | `@hal9k-tmux-key-jump-main`, `-jump-farmer`, `-jump-nvim` | the main checkout's session, the farmer session, the nvim pane |
 | `@hal9k-tmux-key-cli`, `-key-new` | the cli pane, a new worktree session |
-| `@hal9k-tmux-key-back`, `-key-cycle` | back to the place before, the next session |
+| `@hal9k-tmux-key-back`, `-key-cycle` | back to the place before (no default key), the next session |
 | `@hal9k-tmux-key-actions`, `-key-help` | the GitHub Actions page, the key list popup |
 | `@hal9k-tmux-keys` | `off` binds no key at all (default on) |
 | `@hal9k-tmux-hooks` | `off` sets no hooks (default on); `back` then has no history |
 | `@hal9k-tmux-quiet` | `on`: nothing is said in the status line (default off) |
 | `@hal9k-tmux-table` | the key table of an entry that names none (default `root`) |
 | `@hal9k-tmux-leader` | keys that open a leader table `hal9k` (default unset) |
+
+**Option+Tab.** `back` has no default key (the user's decision, plan 0255 D149): `Option+Tab` is the last window of the
+current session, the bind of your own tmux.conf (`bind -n M-Tab if-shell -F '#{==:#{session_name},shot}' 'detach-client'
+'last-window'`; in `shot` it hides the session), and TPM runs the plugin after tmux.conf, so a plugin bind would replace
+it. `hal2-cli-tmux keys` and the help popup list `M-Tab` as "the last window of this session (shot: hides it)" when the
+server binds it to `last-window`; they bind nothing. `@hal9k-tmux-key-back M-Tab` makes `back` take the key (a conflict
+is said once, as any key an option names). Inside a switcher popup (a worktree's shell, an attach) `Option+Tab` closes
+the popup whatever is bound outside, unless `@hal9k-tmux-key-back` names other keys or `none`.
 
 **Leader.** With `@hal9k-tmux-leader` set (say `prefix:Space`), each action also has a key without modifiers in the table
 `hal9k`: `s` picker, `g` picker-all, digits, `m`, `f`, `n`, `c`, `w`, `Tab` back, `BTab` cycle, `a` actions, `?` help.

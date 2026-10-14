@@ -43,11 +43,16 @@ Default keys, in tmux's root table, from `hal2-cli-tmux keys --markdown`; `hal2-
 | `@hal9k-tmux-key-jump-nvim` | `C-S-n` | root | the project's nvim pane |
 | `@hal9k-tmux-key-cli` | `C-S-c` | root | the project's cli pane, made under nvim when missing |
 | `@hal9k-tmux-key-new` | `C-S-w` | root | a new worktree session in a popup |
-| `@hal9k-tmux-key-back` | `M-Tab` | root | back to the place focused before |
+| `@hal9k-tmux-key-back` | none | root | back to the place focused before |
 | `@hal9k-tmux-key-cycle` | `C-BTab` | root | the next tmux session |
 | `@hal9k-tmux-key-actions` | `M-a` | root | the project's GitHub Actions page |
 | `@hal9k-tmux-key-help` | `C-S-/` | root | this list of the plugin's keys |
 <!-- keys:end -->
+
+`back` (across sessions, to the place focused before) has no default key. `Option+Tab` stays the last window of the
+current session (tmux's `last-window`; in the session `shot` it hides it), a bind of your own tmux.conf: the plugin binds
+no `M-Tab`, so yours is not replaced, and `keys` lists it when the server binds it that way. `@hal9k-tmux-key-back M-Tab`
+(or any key) binds `back`. Inside a popup `Option+Tab` closes the popup.
 
 `C-S-` keys arrive only as extended keys: `set -s extended-keys on` and a terminal that sends them (per terminal in
 [docs/keys.md](docs/keys.md)). `M-` keys need Option as Alt on a Mac.
