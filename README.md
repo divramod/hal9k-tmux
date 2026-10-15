@@ -42,7 +42,7 @@ Default keys, in tmux's root table, from `hal2-cli-tmux keys --markdown`; `hal2-
 | `@hal9k-tmux-key-jump-farmer` | `C-S-f` | root | the project's farmer session |
 | `@hal9k-tmux-key-jump-nvim` | `C-S-n` | root | the project's nvim pane |
 | `@hal9k-tmux-key-cli` | `C-S-c` | root | the project's cli pane, made under nvim when missing |
-| `@hal9k-tmux-key-new` | `C-S-w` | root | a new worktree session in a popup |
+| `@hal9k-tmux-key-new` | `C-S-w` | root | a new worktree session, shown in hosts |
 | `@hal9k-tmux-key-back` | none | root | back to the place focused before |
 | `@hal9k-tmux-key-cycle` | `C-BTab` | root | the next tmux session |
 | `@hal9k-tmux-key-actions` | `M-a` | root | the project's GitHub Actions page |
@@ -60,12 +60,13 @@ no `M-Tab`, so yours is not replaced, and `keys` lists it when the server binds 
 ## The picker
 
 A popup of the project's table (`@hal9k-tmux-key-picker`) or of every project's (`-picker-all`). Type to search (a word
-is matched in any one column; `'exact`, `^start`, `end$`, `!not` work as in fzf), Up/Down, Enter goes to the row, Escape
+is matched in any one column, or in the plan's name and its `title`, which no column shows; `'exact`, `^start`,
+`end$`, `!not` work as in fzf), Up/Down, Enter goes to the row (never zoomed: the pane keeps its size), Escape
 closes, a mouse click selects and a double click opens. The query line has no cursor and matches are not highlighted yet.
 
 | Part | What it does |
 |---|---|
-| Rows | a pane per tmux pane; a detached session; a worktree without a session (Enter opens its session); `nvim`, `cli`, `new`; a repository's standard windows (with smug); GitHub rows |
+| Rows | a pane per tmux pane; a detached session; a worktree without a session (Enter starts its agent in a terminal host, shown in its worktree's idle shell or in `hosts`); `nvim`, `cli`, `new`; a repository's standard windows (with smug); GitHub rows |
 | GitHub rows | one per page: code, issues, pulls, actions, run (needs `gh`), agents, projects, security, insights, settings, runners; Enter opens it in the browser |
 | Order | worktrees and branches first, then nvim, cli, new and the GitHub rows, then plain shells |
 | Sorting | click a header to cycle ascending, descending, off (`TOOL▲1`); several columns sort in click order; `[clear sort]` clears; kept per table. Keys `Alt+1` to `Alt+9`, `Alt+0` |
@@ -78,10 +79,14 @@ The plan, queue, model, effort and CTX columns are filled by the optional tools 
 
 ## Popups and commands
 
-- A **shell popup** (a worktree session, `new`) runs behind a key filter: `Ctrl-\` closes a zsh popup (the plugin's own
-  `.zshrc`, which keeps your `ZDOTDIR` and `HISTFILE`); in bash, fish or another shell type `exit` (the title says so).
-- The **busy popup** (three lines, a spinner) appears when a move takes longer than 0.4 s. The **attach popup** opens a
-  detached session in a popup. Inside a popup the plugin's root-table keys still act (none with `@hal9k-tmux-keys off`).
+- No agent opens in a popup: a worktree without a session (and `new`) gets its agent started in a terminal host and
+  shown in a pane, its worktree's idle shell or a window `<alias> <slot>` of the session `hosts`; a detached session
+  hal2 does not list gets a `hosts` window of its own. `Ctrl-\` detaches it and it keeps running.
+- A **shell popup** (a worktree that is not numbered, or any without hal2) runs behind a key filter: `Ctrl-\` closes a zsh
+  popup (the plugin's own `.zshrc`, which keeps your `ZDOTDIR` and `HISTFILE`); in bash, fish or another shell type
+  `exit` (the title says so).
+- The **busy popup** (three lines, a spinner) appears when a move takes longer than 0.4 s. Inside a popup the plugin's
+  root-table keys still act (none with `@hal9k-tmux-keys off`).
 
 | Command | What it does |
 |---|---|
@@ -110,7 +115,7 @@ All are tmux options (`set -g @hal9k-tmux-...`); the defaults below are the auth
 | `@hal9k-tmux-first-new-slot` | `21` | the first worktree number a `new` session takes |
 | `@hal9k-tmux-agents-ttl` | `120` | seconds an agent list stands in for a fresh one |
 | `@hal9k-tmux-integrations` | all four | the optional tools to use when found; `none` for none |
-| `@hal9k-tmux-popup-width`, `@hal9k-tmux-popup-height`, `@hal9k-tmux-cli-height` | `90%`, `90%`, `30%` | size of a worktree or new-session popup, and of the cli pane |
+| `@hal9k-tmux-popup-width`, `@hal9k-tmux-popup-height`, `@hal9k-tmux-cli-height` | `90%`, `90%`, `30%` | size of a shell popup, and of the cli pane |
 | `@hal9k-tmux-picker-width`, `@hal9k-tmux-picker-width-all`, `@hal9k-tmux-picker-height` | `80%`, `95%`, `95%` | the picker popup's size (cells or percent) |
 | `@hal9k-tmux-browser-app` | `Google Chrome` | macOS: the browser whose open tab for a GitHub page is raised; `none` opens plain |
 | `@hal9k-tmux-terminal-termname`, `@hal9k-tmux-terminal-bundle`, `@hal9k-tmux-terminal-command` | `xterm-ghostty`, `com.mitchellh.ghostty`, unset | the terminal a `pick` from outside tmux uses: its client's TERM (`any` for every client), its macOS bundle id or Linux app id, a shell command that opens a window (`{command}` is what it runs) |
@@ -124,7 +129,7 @@ CTX, previews), `hal2-cli-git` (QUEUE, the `new` row, worktree sessions; without
 
 State is in `$XDG_STATE_HOME/hal9k-tmux` (else `~/.local/state/hal9k-tmux`; on Windows the logs are in
 `%TEMP%\hal9k-tmux`): `conf/` (the keys sourced), `focus/` (places for `back`), `picker-sort.json`, `agents.json`,
-`pick.log`, `hotkeys.log` (cut at 256 KB), `hotkeys.*` (the agent), `zsh/` (the popup's `.zshrc`), short-lived `busy-*`.
+`pick.log`, `hotkeys.log`, `keys.log` (a key's failure; each cut at 256 KB), `hotkeys.*` (the agent), `zsh/` (the popup's `.zshrc`), short-lived `busy-*`.
 
 | System | Keys and picker | Global hotkeys | Raising the terminal |
 |---|---|---|---|

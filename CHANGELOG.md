@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.3.0 (2026-10-15)
+
+### Features
+
+- agents open in hosts, never a popup; the search matches the plan's title; a key's command is retried and guarded, never tmux's view mode
+- a pick keeps the pane's size, never zooms it
+
+### Fixes
+
+- the hotkeys agent serves a press made after a pick ended, drops only those made during it; the life test waits on the agent's state
+
+Also 1 internal change.
+
 ## v0.2.3 (2026-10-14)
 
 - internal changes

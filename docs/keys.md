@@ -30,11 +30,22 @@ current session, the bind of your own tmux.conf (`bind -n M-Tab if-shell -F '#{=
 'last-window'`; in `shot` it hides the session), and TPM runs the plugin after tmux.conf, so a plugin bind would replace
 it. `hal2-cli-tmux keys` and the help popup list `M-Tab` as "the last window of this session (shot: hides it)" when the
 server binds it to `last-window`; they bind nothing. `@hal9k-tmux-key-back M-Tab` makes `back` take the key (a conflict
-is said once, as any key an option names). Inside a switcher popup (a worktree's shell, an attach) `Option+Tab` closes
+is said once, as any key an option names). Inside a switcher popup (a worktree's shell; an agent never opens in one) `Option+Tab` closes
 the popup whatever is bound outside, unless `@hal9k-tmux-key-back` names other keys or `none`.
 
 **Leader.** With `@hal9k-tmux-leader` set (say `prefix:Space`), each action also has a key without modifiers in the table
 `hal9k`: `s` picker, `g` picker-all, digits, `m`, `f`, `n`, `c`, `w`, `Tab` back, `BTab` cycle, `a` actions, `?` help.
+
+**Under load** (plan 0255 D152). A key's `run-shell` job that exits non-zero or prints shows in the pane's view mode
+("'...' returned 1"); the plugin's keys never do. Each bind runs its command behind an inline guard,
+`{ <program> <args> || { sleep 0.2; <program> <args>; } || tmux display-message -c '#{client_name}' 'hal9k-tmux: <action>
+could not run, tried twice'; } >/dev/null 2>&1`: a program that cannot start or dies is started once more, else the status
+line says so (the hooks' guard says nothing). Inside, the program retries a tmux call a busy server refused (three
+more tries, 170 ms at most) and ends with 0 whatever fails, a panic too: the failure is a line of `keys.log` in the state
+folder and one message, "hal9k-tmux: <what> failed, retried <n> times; see <log>". Your own binds get the same guard by
+writing the line above around `#{@hal9k-tmux-cli} <command>`. `HAL9K_TMUX_FAIL_ONCE=<file>` in the server's environment
+makes every start without the file make it and die, the next one take it away and run: each press fails once and still
+acts (a test switch; `HAL9K_TMUX_PANIC=1` makes a key's command panic).
 
 **Conflicts.** A default key that is bound to something else is left alone and said once (set the option to another
 key to take it, or to its own key to confirm). A key an option names replaces any binding and is said once. A key
